@@ -2,17 +2,18 @@
  *	The game of Pig.
  *	(Description here)
  *
- *	@author	
- *	@since	
+ *	@author	Ananya Kotla
+ *	@since	September 14, 2024
  */
- import java.util.Scanner;
-public class PigGame {
-	
+import java.util.Scanner;
+public class PigGame 
+{
 	private int compFinalScore;
 	private int userFinalScore;
 	private int userTurnScore;
 	private	int compTurnScore;
 	private boolean userTurn;
+	private String continueNext;
 	
 	public PigGame()
 	{
@@ -21,17 +22,19 @@ public class PigGame {
 		userTurnScore = 0;
 	    compTurnScore = 0;
 	    userTurn = true;
+		continueNext = new String("");
 	}
 	
 	public static void main(String[] args)
 	{
 		PigGame pg = new PigGame();
 		pg.printIntroduction();
-		pg.play();
+		pg.rolls();
+		pg.winner();
 	}
 	/**	Print the introduction to the game */
 	public void printIntroduction() {
-		System.out.println("\n");
+		System.out.println("\n\n");
 		System.out.println("______ _         _____");
 		System.out.println("| ___ (_)       |  __ \\");
 		System.out.println("| |_/ /_  __ _  | |  \\/ __ _ _ __ ___   ___");
@@ -52,27 +55,38 @@ public class PigGame {
 		System.out.println("\n");
 	}
 	
-	public void play()
+	public void rolls()
 	{
 		Dice d = new Dice();		
 		int diceNum = 0;
-		String continueNext2 = new String("");
 
-		while(compFinalScore < 100)
+		while(compFinalScore < 100 && userFinalScore < 100)
 		{
 			if(userTurn == true)
 			{
-				System.out.println("\n**** USER Turn ***");
+				System.out.println("\n**** USER Turn ***\n");
 			}
-			else
+			else if(userTurn == false)
 			{
-				System.out.println("\n**** COMPUTER'S Turn ***");
+				System.out.println("\n**** COMPUTER'S Turn ***\n");
 			}
-			continueNext2 = printScores();
-			while((userTurn == true && continueNext2.equalsIgnoreCase("r")) || (userTurn == false && continueNext2.equalsIgnoreCase("")))
+			printScores();
+			if(continueNext.equalsIgnoreCase("h"))
+			{
+				userTurn = false;
+				System.out.println("\n");
+			}
+			while((userTurn == true && continueNext.equalsIgnoreCase("r")) || (userTurn == false && continueNext.equalsIgnoreCase("")))
 			{
 				diceNum = d.roll();
-				System.out.println("\nYou ROLL");
+				if(userTurn == true)
+				{
+					System.out.println("\nYou ROLL");
+				}
+				else
+				{
+					System.out.println("\nComputer will ROLL");
+				}
 				d.printDice();
 				if(diceNum != 1)
 				{
@@ -84,7 +98,7 @@ public class PigGame {
 					{
 						compTurnScore = compTurnScore + diceNum;
 					}
-					System.out.println("\n");
+					System.out.println("");
 				}
 				else
 				{
@@ -92,52 +106,86 @@ public class PigGame {
 					{
 						System.out.println("\nYou LOSE your turn.");
 						userTurnScore = 0;
-						System.out.println("Your total score: " + userFinalScore);
+						System.out.println("Your total score: " + userFinalScore + "\n");
+						userTurn = false;
 					
 					}
 					else
 					{
-						System.out.println("\Computer loses turn.");
+						System.out.println("\nComputer LOSES turn.");
 						compTurnScore = 0;
-						System.out.println("Computer total score: " + compFinalScore);
-						
+						System.out.println("Computer total score: " + compFinalScore + "\n");
+						userTurn = true;
 					}
 					
 				}
-				if(userTurnScore !=0 || compTurnScore !=0)
-				{
-					continueNext2 = printScores();
-				}
-				else
-				{	
-					continueNext2 = "h";
-				}
-			}
-			if(continueNext2.equalsIgnoreCase("h"))
-			{
-				if(userTurn = true)
+				holds();	
 			}
 		}
 	}
-	
-	public String printScores()
+
+	public void holds()
+	{
+		if(userTurnScore !=0 || compTurnScore !=0)
+		{
+			printScores();
+					
+			if((userTurn == false && compTurnScore >= 20) || (userTurn == false && compTurnScore + compFinalScore >= 100))
+			{
+				continueNext = "h";
+				System.out.println("Computer will HOLD");
+				compFinalScore = compFinalScore + compTurnScore;
+				System.out.println("Computer's total score: " + compFinalScore + "\n");
+				compTurnScore = 0;
+				userTurn = true;
+			}
+			else if(continueNext.equalsIgnoreCase("h")&& userTurn == true)
+			{
+				System.out.println("\nYou HOLD");
+				userFinalScore = userFinalScore + userTurnScore;
+				System.out.println("Your total score: " + userFinalScore + "\n");
+				userTurnScore= 0;
+				userTurn = false;
+			}
+		}
+		else
+		{	
+			continueNext = "h";
+		}
+	}
+
+	public void printScores()
 	{
 		Scanner kb = new Scanner(System.in);
 		if(userTurn == true)
 		{
-			System.out.printf("\n%-20s %d\n", "Your turn score:", userTurnScore);	
+			System.out.printf("%-20s %d\n", "Your turn score:", userTurnScore);	
 			System.out.printf("%-20s %d\n", "Your final score:", userFinalScore);
 			System.out.print("\n(r)oll or (h)old -> ");
 		}
 		else
+
 		{
-			System.out.printf("\n%-20s %d\n", "Your turn score:", compTurnScore);	
-			System.out.printf("%-20s %d\n", "Your final score:", compFinalScore);
-			System.out.print("Press enter for computer turn -> ");	
+			System.out.printf("%-20s %d\n", "Computer's turn score:", compTurnScore);	
+			System.out.printf("%-20s %d\n", "Computer's final score:", compFinalScore);
+			System.out.print("\nPress enter for computer turn -> ");	
 		}
-		Scanner kb = new Scanner(System.in);
-		String continueNext = kb.next();
-		return continueNext;
+		continueNext = kb.nextLine();
+	}
+
+	public void winner()
+	{
+		if(userFinalScore >= 100)
+		{
+			System.out.println("Congratulations!!! YOU WON!!!!");
+			System.out.println("\nThanks for playing the Pig Game!!!");
+		}
+		else if(compFinalScore >= 100)
+		{
+			System.out.println("Computer WON!!!! Better Luck Next Time!\n\n");
+			System.out.println("\nThanks for playing the Pig Game!!!\n\n");
+		}
+		
 	}
 	
 }
