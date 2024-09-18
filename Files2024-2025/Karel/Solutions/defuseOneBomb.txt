@@ -1,0 +1,24 @@
+/*
+F1 = moveForward();
+F2 = turnLeft();
+F3 = turnAround();
+F4 = turnRight();
+F5 = pickBeeper();
+F6 = dropBeeper();
+*/
+
+void defuseOneBomb()
+{
+    // your code here
+    goForward();
+    pickBeeper();
+    turnAround();
+    goForward();
+}
+void goForward()
+{
+    repeat(9)
+    {
+        moveForward();
+    }
+}
