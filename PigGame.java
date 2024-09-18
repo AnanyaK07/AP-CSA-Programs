@@ -29,8 +29,7 @@ public class PigGame
 	{
 		PigGame pg = new PigGame();
 		pg.printIntroduction();
-		pg.rolls();
-		pg.winner();
+		pg.choose();
 	}
 	/**	Print the introduction to the game */
 	public void printIntroduction() {
@@ -55,6 +54,63 @@ public class PigGame
 		System.out.println("\n");
 	}
 	
+	public void choose()
+	{
+		String chosen = new String("");
+		Scanner kb2 = new Scanner(System.in);
+		System.out.print("Play game or Statistics (p or s) -> "); 
+		chosen = kb2.nextLine();
+		if(chosen.equalsIgnoreCase("p"))
+		{
+			rolls();
+		}
+		else if(chosen.equalsIgnoreCase("s"))
+		{
+			stats();
+		}
+		
+		
+	}
+	public void stats()
+	{
+		int[] score = new int[10000000];
+		int turns = 0;
+		Dice d = new Dice();		
+		int diceNum2 = 0;
+		Scanner kb3 = new Scanner(System.in);
+		System.out.print("\nNumber of turns (1000 - 10000000) -> ");
+		turns = kb3.nextInt();
+		if(turns <= 10000000 && turns >= 1000)
+		{
+			for(int a = 1; a <= turns; a++)
+			{
+				while(diceNum2 != 1 && compTurnScore <= 20)
+				{
+					diceNum2 = d.roll();
+					if(diceNum2 != 1)
+					{
+						compTurnScore = compTurnScore + diceNum2;
+					}
+					else
+					{
+						score[a-1] = compTurnScore;
+					}
+				}
+			}
+			
+			System.out.printf("\n%-8s%s\n","Score", "Estimated Probability");
+			for(int b = 1; b <= turns; b++)
+			{
+				if(score[b-1] == 0)
+				{
+					
+				}
+			}
+			
+		}
+		
+		
+	}
 	public void rolls()
 	{
 		Dice d = new Dice();		
@@ -122,6 +178,7 @@ public class PigGame
 				holds();	
 			}
 		}
+		winner();
 	}
 
 	public void holds()
