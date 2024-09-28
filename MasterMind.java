@@ -39,7 +39,6 @@ public class MasterMind {
 		printIntroduction();
 		createMaster();
 		askUser();
-
 	}
 	/**
 	 *	Print the introduction screen
