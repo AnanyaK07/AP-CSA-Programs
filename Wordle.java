@@ -6,6 +6,7 @@ import java.util.Scanner;
 import java.io.PrintWriter;
 import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
+import javax.lang.model.util.ElementScanner6;
 import javax.swing.JDialog;
 
 /**
@@ -49,7 +50,8 @@ public class Wordle
 	/**  An array to determine how to color the keyboard at the bottom of the gameboard.
 	 *   0 for not checked yet, 1 for no match, 2 for partial, 3 for exact
 	 */
-	private int [] keyBoardColors;						
+	private int [] keyBoardColors;	
+	private int[] combined;					
 	
 	/** 
 	 *	Creates a Wordle object.  A constructor.  Initializes all of the variables by 
@@ -85,7 +87,8 @@ public class Wordle
 		readyForKeyInput = activeGame = true;
 		readyForMouseInput = false;
 		keyBoardColors = new int[29];
-		word = openFileAndChooseWord(WORDS5, testWord);		
+		word = openFileAndChooseWord(WORDS5, testWord);	
+		combined = new int[word.length() * 6];	
 	}
 
 	/**
@@ -104,7 +107,7 @@ public class Wordle
 		// args[1] is a word which is used as the chosen word
 		if(args.length >0)
 		{
-			if(args[0] = "show")
+			if(args[0].equalsIgnoreCase("show"))
 			{
 				showIt = "show";
 				if(args.length == 2)
@@ -167,18 +170,28 @@ public class Wordle
 	{
 		String result = "SMART";
 		int wordLine = 0;
+		int lineIncrease = 1;
+		boolean acceptWord = false;
 		Scanner readOutput;
 		if(testWord.length() == 5)
 		{
-			inAllowedWordFile(testWord);
+			acceptWord = inAllowedWordFile(testWord);
+			result = testWord.toUpperCase();
 		}
-		else
+		if(acceptWord == false)
 		{
-			readOutput = FileUtils.openToRead(infileName);
+			readOutput = FileUtils.openToRead(inFileName);
 			wordLine = (int)(Math.random()*2309) + 1;
-			while(readOutput.hasNext
-		}	
-		
+			while(readOutput.hasNext() && lineIncrease <= wordLine)
+			{
+				result = readOutput.nextLine().toUpperCase();
+				lineIncrease++;
+			}
+		}
+		if(show == true)
+		{
+			System.out.println(result);
+		}
 		return result;
 	}
 
@@ -192,7 +205,14 @@ public class Wordle
 	 */
 	public boolean inAllowedWordFile(String possibleWord)
 	{
-		
+		Scanner readWords = FileUtils.openToRead(WORDS5_ALLOWED);
+		while(readWords.hasNext())
+		{
+			if(possibleWord.equalsIgnoreCase(readWords.nextLine()))
+			{
+				return true;
+			}
+		}
 		return false;
 	}
 	
@@ -208,20 +228,29 @@ public class Wordle
 	public void processGuess ( )
 	{
 		letters = letters.toUpperCase();
-		
-		// if guess is in words5allowed.txt then put into guess list
-		int guessNumber = 0;
-		for(int i = 0; i < wordGuess.length; i++)
+		boolean goodGuess = false;
+		Scanner readLetters = FileUtils.openToRead(WORDS5_ALLOWED);
+		while(readLetters.hasNext())
 		{
-			if(wordGuess[i].length() == 5)
+			if(letters.equalsIgnoreCase(readLetters.nextLine()))
 			{
-				guessNumber = i + 1;
+				int guessNumber = 0;
+				for(int i = 0; i < wordGuess.length; i++)
+				{
+					if(wordGuess[i].length() == 5)
+					{
+						guessNumber = i + 1;
+					}
+				}
+				wordGuess[guessNumber] = letters.toUpperCase();
+				letters = "";
+				goodGuess = true;
 			}
 		}
-		wordGuess[guessNumber] = letters.toUpperCase();
-		letters = "";
-		
-		// else if guess is not in words5allowed.txt then print dialog box
+		if(goodGuess == false)
+		{
+			JOptionPane.showMessageDialog(null, letters + " is not in word list.");
+		}
 
 	}
 	
@@ -238,20 +267,85 @@ public class Wordle
 		// Determine color of guessed letters and draw backgrounds
 	 	// 0 for not checked yet, 1 for no match, 2 for partial, 3 for exact
 		// draw guessed letter backgrounds
+		boolean[] whereExact = new boolean[word.length()];
+		boolean[] wherePartial = new boolean[word.length()];
+		
+		int arrayNum = 0;
+		for(int a = 0; a < wordGuess.length; a++)
+		{
+			if(wordGuess[a].length() == 0)
+			{
+				arrayNum = a -1;
+				a = wordGuess.length - 1;
+			}
+		}
 
 
-
-
+		if(arrayNum >= 0)
+		{
+			for(int e = 0; e < word.length(); e++)
+			{
+		
+				if( word.charAt(e) != wordGuess[arrayNum].charAt(e))
+				{
+					for(int f = 0; f < word.length(); f++)
+					{
+					
+						if(word.charAt(f) == wordGuess[arrayNum].charAt(e))
+						{
+							if(whereExact[f] == false && wherePartial[f] == false)
+							{
+								wherePartial[f] = true;
+								combined[e + (arrayNum * 5)] = 2;
+								f = word.length() -1;
+							}
+						}
+						else
+						{
+							combined[e+ (arrayNum * 5)] = 1;
+						}
+					}
+				}
+				else
+				{
+					whereExact[e] = true;
+					combined[e+ (arrayNum * 5)] = 3;
+					if(wherePartial[e] == true)
+					{
+						for(int s = 0; s < e; s++)
+						{
+							if(word.charAt(e) == wordGuess[arrayNum].charAt(s) && combined[s + (arrayNum * 5)] == 2)
+							{
+								wherePartial[e] = false;
+								combined[s + (arrayNum * 5)] = 1;
+							}
+						}
+					}
+				}
+			}
+		}
 		
 		for(int row = 0; row < 6; row++)
 		{
 			for(int col = 0; col < 5; col++)
 			{
-				if(wordGuess[row].length() != 0)											//  THIS METHOD IS INCOMPLETE.
+	
+				if(wordGuess[row].length() != 0 && row <= arrayNum)											//  THIS METHOD IS INCOMPLETE.
 				{
-					StdDraw.picture(209 + col * 68, 650 - row * 68, "letterFrameDarkGray.png");
+					if(combined[col+ (5 * row)] == 1)
+					{
+						StdDraw.picture(209 + col * 68, 650 - row * 68, "letterFrameDarkGray.png");
+					}
+					else if(combined[col + (5 * row)] == 2)
+					{
+						StdDraw.picture(209 + col * 68, 650 - row * 68, "letterFrameYellow.png");
+					}
+					else if (combined[col + (5 * row)] == 3 ) 
+					{
+						StdDraw.picture(209 + col * 68, 650 - row * 68, "letterFrameGreen.png");
+					}
 				}
-				else
+				else if(row > arrayNum)
 				{
 					StdDraw.picture(209 + col * 68, 650 - row * 68, "letterFrame.png");
 				}
@@ -277,13 +371,74 @@ public class Wordle
 			//  so that the correct colors show up.
 			else
 			{
-				StdDraw.picture(pair[0], pair[1], "keyBackground.png");
+				if(arrayNum >= 0)
+				{
+					for(int i = 0; i < 6; i++)
+					{
+						System.out.println(i);
+						tempWord = wordGuess[i];
+						for(int j = 0; j < 5; j++)
+						{
+							System.out.println(Constants.KEYS[place]+ " " + tempWord.charAt(j));
+							if(Constants.KEYS[place] == tempWord.charAt(j))
+							{
+								if(combined[j + (5 * i)] == 1)
+								{	
+									if(keyBoardColors[place] != 3)
+									{
+										keyBoardColors[place] = 1;
+									}
+
+								}
+								else if(combined[j + (5 * i)] == 2)
+								{
+									if(keyBoardColors[place] != 3)
+									{
+										keyBoardColors[place] = 2;
+									}
+								}
+								else if(combined[j + (5 * i)] == 3)
+								{
+									keyBoardColors[place] = 3;
+								}
+							}
+							else
+							{
+								keyBoardColors[place] = 0;
+							}
+						}
+						if(wordGuess[i+1].equalsIgnoreCase(""))
+						{
+							System.out.println("bboo");
+							i = 5;
+						}
+					}
+				}
 			}
-			StdDraw.setPenColor(StdDraw.BLACK);
-			StdDraw.text(pair[0], pair[1], Constants.KEYBOARD[place]);
 			place++;
 		}
-		
+		for(int h = 0; h < Constants.KEYS.length; h++)
+		{
+			if(keyBoardColors[h] == 0)
+			{
+				StdDraw.picture(Constants.KEYPLACEMENT[h][0], Constants.KEYPLACEMENT[h][1], "keyBackground.png");
+			}
+			else if(keyBoardColors[h] == 1)
+			{
+				StdDraw.picture(Constants.KEYPLACEMENT[h][0], Constants.KEYPLACEMENT[h][1], "keyBackgroundDarkGray.png");
+			}
+			else if(keyBoardColors[h] == 2)
+			{
+				StdDraw.picture(Constants.KEYPLACEMENT[h][0], Constants.KEYPLACEMENT[h][1], "keyBackgroundYellow.png");
+			}
+			else if(keyBoardColors[h] == 3)
+			{
+				StdDraw.picture(Constants.KEYPLACEMENT[h][0], Constants.KEYPLACEMENT[h][1], "keyBackgroundGreen.png");
+			}
+			StdDraw.setPenColor(StdDraw.BLACK);
+			StdDraw.text(Constants.KEYPLACEMENT[h][0], Constants.KEYPLACEMENT[h][1], Constants.KEYBOARD[h]);
+		}
+	
 		// draw guesses
 		drawAllLettersGuessed();
 		
