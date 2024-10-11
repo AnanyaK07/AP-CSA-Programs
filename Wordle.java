@@ -278,6 +278,10 @@ public class Wordle
 				arrayNum = a -1;
 				a = wordGuess.length - 1;
 			}
+			else if(wordGuess[5] .length() == 5)
+			{
+				arrayNum = 5;
+			}
 		}
 
 
@@ -302,7 +306,7 @@ public class Wordle
 						}
 						else
 						{
-							combined[e+ (arrayNum * 5)] = 1;
+							combined[e+ (arrayNum * 5)] = 1; 
 						}
 					}
 				}
@@ -310,6 +314,7 @@ public class Wordle
 				{
 					whereExact[e] = true;
 					combined[e+ (arrayNum * 5)] = 3;
+					
 					if(wherePartial[e] == true)
 					{
 						for(int s = 0; s < e; s++)
@@ -375,11 +380,9 @@ public class Wordle
 				{
 					for(int i = 0; i < 6; i++)
 					{
-						System.out.println(i);
 						tempWord = wordGuess[i];
 						for(int j = 0; j < 5; j++)
 						{
-							System.out.println(Constants.KEYS[place]+ " " + tempWord.charAt(j));
 							if(Constants.KEYS[place] == tempWord.charAt(j))
 							{
 								if(combined[j + (5 * i)] == 1)
@@ -404,12 +407,14 @@ public class Wordle
 							}
 							else
 							{
-								keyBoardColors[place] = 0;
+								if(keyBoardColors[place] != 3 && keyBoardColors[place] != 2 && keyBoardColors[place] != 1)
+								{
+									keyBoardColors[place] = 0;
+								}
 							}
 						}
-						if(wordGuess[i+1].equalsIgnoreCase(""))
+						if(i < 5 && wordGuess[i+1].equalsIgnoreCase(""))
 						{
-							System.out.println("bboo");
 							i = 5;
 						}
 					}
@@ -417,7 +422,7 @@ public class Wordle
 			}
 			place++;
 		}
-		for(int h = 0; h < Constants.KEYS.length; h++)
+		for(int h = 0; h < Constants.KEYBOARD.length; h++)
 		{
 			if(keyBoardColors[h] == 0)
 			{
@@ -490,11 +495,13 @@ public class Wordle
 	public void checkIfWonOrLost ( )
 	{
 		String lastWord = "";
+		int guessNum = 0;
 		for(int i = 0; i < wordGuess.length; i++)
 		{
 			if(wordGuess[i].length() == 5)
 			{
 				lastWord = wordGuess[i];
+				guessNum = i;
 			}
 		}
 		
@@ -507,12 +514,15 @@ public class Wordle
 			d.setLocation(365,250);
 			d.setVisible(true);
 		}
-		
+		else if(guessNum == 5)
+		{
+			activeGame = false;
+			JOptionPane pane = new JOptionPane(word + " was the word.  Press RESET to begin again");
+			JDialog d = pane.createDialog(null, "Sorry!");
+			d.setLocation(365,250);
+			d.setVisible(true);
+		}	
 		// else if all guesses are filled then declare loser
-		
-		
-		
-		
 	}
 	
 	/** 
