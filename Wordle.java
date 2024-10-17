@@ -51,7 +51,7 @@ public class Wordle
 	 *   0 for not checked yet, 1 for no match, 2 for partial, 3 for exact
 	 */
 	private int [] keyBoardColors;	
-	private int[] combined;					
+	private int[] guessColors;					
 	
 	/** 
 	 *	Creates a Wordle object.  A constructor.  Initializes all of the variables by 
@@ -88,7 +88,7 @@ public class Wordle
 		readyForMouseInput = false;
 		keyBoardColors = new int[29];
 		word = openFileAndChooseWord(WORDS5, testWord);	
-		combined = new int[word.length() * 6];	
+		guessColors = new int[word.length() * 6];	
 	}
 
 	/**
@@ -289,40 +289,38 @@ public class Wordle
 		{
 			for(int e = 0; e < word.length(); e++)
 			{
-		
 				if( word.charAt(e) != wordGuess[arrayNum].charAt(e))
 				{
 					for(int f = 0; f < word.length(); f++)
 					{
-					
 						if(word.charAt(f) == wordGuess[arrayNum].charAt(e))
 						{
 							if(whereExact[f] == false && wherePartial[f] == false)
 							{
 								wherePartial[f] = true;
-								combined[e + (arrayNum * 5)] = 2;
+								guessColors[e + (arrayNum * 5)] = 2;
 								f = word.length() -1;
 							}
 						}
 						else
 						{
-							combined[e+ (arrayNum * 5)] = 1; 
+							guessColors[e+ (arrayNum * 5)] = 1; 
 						}
 					}
 				}
 				else
 				{
 					whereExact[e] = true;
-					combined[e+ (arrayNum * 5)] = 3;
+					guessColors[e+ (arrayNum * 5)] = 3;
 					
 					if(wherePartial[e] == true)
 					{
 						for(int s = 0; s < e; s++)
 						{
-							if(word.charAt(e) == wordGuess[arrayNum].charAt(s) && combined[s + (arrayNum * 5)] == 2)
+							if(word.charAt(e) == wordGuess[arrayNum].charAt(s) && guessColors[s + (arrayNum * 5)] == 2)
 							{
 								wherePartial[e] = false;
-								combined[s + (arrayNum * 5)] = 1;
+								guessColors[s + (arrayNum * 5)] = 1;
 							}
 						}
 					}
@@ -334,18 +332,17 @@ public class Wordle
 		{
 			for(int col = 0; col < 5; col++)
 			{
-	
 				if(wordGuess[row].length() != 0 && row <= arrayNum)											//  THIS METHOD IS INCOMPLETE.
 				{
-					if(combined[col+ (5 * row)] == 1)
+					if(guessColors[col+ (5 * row)] == 1)
 					{
 						StdDraw.picture(209 + col * 68, 650 - row * 68, "letterFrameDarkGray.png");
 					}
-					else if(combined[col + (5 * row)] == 2)
+					else if(guessColors[col + (5 * row)] == 2)
 					{
 						StdDraw.picture(209 + col * 68, 650 - row * 68, "letterFrameYellow.png");
 					}
-					else if (combined[col + (5 * row)] == 3 ) 
+					else if (guessColors[col + (5 * row)] == 3 ) 
 					{
 						StdDraw.picture(209 + col * 68, 650 - row * 68, "letterFrameGreen.png");
 					}
@@ -385,22 +382,21 @@ public class Wordle
 						{
 							if(Constants.KEYS[place] == tempWord.charAt(j))
 							{
-								if(combined[j + (5 * i)] == 1)
+								if(guessColors[j + (5 * i)] == 1)
 								{	
 									if(keyBoardColors[place] != 3)
 									{
 										keyBoardColors[place] = 1;
 									}
-
 								}
-								else if(combined[j + (5 * i)] == 2)
+								else if(guessColors[j + (5 * i)] == 2)
 								{
 									if(keyBoardColors[place] != 3)
 									{
 										keyBoardColors[place] = 2;
 									}
 								}
-								else if(combined[j + (5 * i)] == 3)
+								else if(guessColors[j + (5 * i)] == 3)
 								{
 									keyBoardColors[place] = 3;
 								}
@@ -443,7 +439,6 @@ public class Wordle
 			StdDraw.setPenColor(StdDraw.BLACK);
 			StdDraw.text(Constants.KEYPLACEMENT[h][0], Constants.KEYPLACEMENT[h][1], Constants.KEYBOARD[h]);
 		}
-	
 		// draw guesses
 		drawAllLettersGuessed();
 		
