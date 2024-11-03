@@ -1,3 +1,5 @@
+
+
 /**
  *	Utilities for handling HTML
  *
@@ -18,10 +20,66 @@ public class HTMLUtilities {
 		// make the size of the array large to start
 		int indexResult = 0;
 		String[] result = new String[10000];
-		while(str.indexOf('<') != -1)
+		while(str.length() != 0)
 		{
-			result[indexResult] = str.substring(str.indexOf('<'), str.indexOf('>') + 1);
-			str = result[indexResult];
+			if(str.charAt(0) == '<')
+			{
+				result[indexResult] = str.substring(str.indexOf('<'), str.indexOf('>') + 1);
+				str = str.substring(str.indexOf('>') + 1).trim();
+			}
+			else if(Character.isLetter(str.charAt(0)))
+			{
+				int include = 0;
+				boolean check = true;
+				while(check)
+				{
+					if(Character.isLetter(str.charAt(include)) || str.charAt(include) == '-' && Character.isLetter(str.charAt(include + 1)))
+					{
+						include++;
+						if(include == str.length())
+						{
+							result[indexResult] = str.substring(0);
+							str = "";
+							check = false;
+						}
+					}
+					else
+					{
+						result[indexResult] = str.substring(0, include);
+						str = str.substring(include).trim();
+						check = false;
+					}
+				}
+			}
+			else if(str.charAt(0) == ',' || str.charAt(0) ==  '.' || str.charAt(0) == ',' || str.charAt(0) == ';' || str.charAt(0) == ':' || str.charAt(0) == '(' || str.charAt(0) == ')' || str.charAt(0) == '?' || str.charAt(0) == '!' || str.charAt(0) == '=' || str.charAt(0) == '&' || str.charAt(0) == '~' || str.charAt(0) == '+'|| str.charAt(0) == '-' && Character.isDigit(str.charAt(1)) == false)
+			{
+				result[indexResult] = str.substring(0, 1);
+				str = str.substring(1).trim();
+			}
+			else if(Character.isDigit(str.charAt(0)) || str.charAt(0) == '-' && Character.isDigit(str.charAt(1)))
+			{
+				int include = 0;
+				boolean check = true;
+				while(check)
+				{
+					if(Character.isDigit(str.charAt(include)) || (include + 1 != str.length() && (str.charAt(include) == '-' || str.charAt(include) == '.' )) && Character.isDigit(str.charAt(include + 1)) || str.charAt(include) == 'e' && (str.charAt(include + 1) == '-' || Character.isDigit(str.charAt(include + 1))))
+					{
+						include++;
+						if(include == str.length())
+						{
+							result[indexResult] = str.substring(0);
+							str = "";
+							check = false;
+						}
+					}
+					else
+					{
+						result[indexResult] = str.substring(0, include);
+						str = str.substring(include).trim();
+						check = false;
+					}
+				}
+			}
 			indexResult++;
 		}
 		String[] actualResult = new String[indexResult];
@@ -30,7 +88,6 @@ public class HTMLUtilities {
 			actualResult[x] = result[x];
 		}
 		// return the correctly sized array
-		
 		return actualResult;
 	}
 	
