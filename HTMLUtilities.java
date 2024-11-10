@@ -8,6 +8,8 @@
  */
 public class HTMLUtilities {
 
+	private boolean aComment;
+	private boolean aPreFText;
 	/**
 	 *	Break the HTML string into tokens. The array returned is
 	 *	exactly the size of the number of tokens in the HTML string.
@@ -20,12 +22,40 @@ public class HTMLUtilities {
 		// make the size of the array large to start
 		int indexResult = 0;
 		String[] result = new String[10000];
+		str = str.trim();
 		while(str.length() != 0)
 		{
-			if(str.charAt(0) == '<')
+			if(str.charAt(0) == '<' || aComment == true || aPreFText == true)
 			{
-				result[indexResult] = str.substring(str.indexOf('<'), str.indexOf('>') + 1);
-				str = str.substring(str.indexOf('>') + 1).trim();
+				if(str.indexOf("<!--") == 0 || aComment == true)
+				{
+					if(str.indexOf("-->") == -1)
+					{
+						str = "";
+						aComment = true;
+					}
+					else
+					{
+						str = str.substring(str.indexOf('>') + 1);
+						aComment = false;
+					}
+					indexResult--;
+				}
+				else if(str.equalsIgnoreCase("<pre>") || aPreFText == true)
+				{
+					result[indexResult]= str;
+					str = "";
+					aPreFText = true;
+					if(result[indexResult].equalsIgnoreCase("</pre>"))
+					{
+						aPreFText = false;
+					}
+				}
+				else
+				{
+					result[indexResult] = str.substring(str.indexOf('<'), str.indexOf('>') + 1);
+					str = str.substring(str.indexOf('>') + 1).trim();
+				}
 			}
 			else if(Character.isLetter(str.charAt(0)))
 			{
