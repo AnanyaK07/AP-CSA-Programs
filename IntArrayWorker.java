@@ -108,10 +108,12 @@ public class IntArrayWorker
   {
 	  for(int row = 0; row < matrix.length; row++)
 	  {
-		  int first = matrix[row][0];
-		  for(int col = 1; col < matrix[row].length; col++)
+		  
+		  for(int col = 0; col < matrix[row].length; col++)
 		  {
-			  matrix[row][col-1] = matrix[row][col];
+			  int first = matrix[row][col];
+			  matrix[row][col] = matrix[row][(matrix[row].length - 1)- col ];
+			  matrix[row][(matrix[row].length - 1) - col] = first;
 		  }
 		  matrix[row][matrix[row].length - 1] = first;
 			
