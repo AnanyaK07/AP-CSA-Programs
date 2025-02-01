@@ -96,10 +96,9 @@ public class IntArrayWorkerTester
 	  IntArrayWorker worker = new IntArrayWorker();
 	  int [][] nums2 = {{1, 2, 3, 4}, {5, 6, 7, 8}};
 	  worker.setMatrix(nums2);
-	  System.out.println("Array before reverseRows:");
+	  System.out.println("\nArray before reverseRows:");
 	  worker.print();
 	  worker.reverseRows();
-	  System.out.println();
 	  System.out.println("Array after reverseRows:");
 	  worker.print();
 	}
