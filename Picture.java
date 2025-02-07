@@ -245,10 +245,106 @@ public class Picture extends SimplePicture
 			}
 		 }
       }
-    
-    }
-	  
+    } 
   }
+	/** Method that blurs the picture
+	* @param size Blur size, greater is more blur
+	* @return Blurred picture
+	*/
+	public Picture blur(int size)
+	{
+		Pixel[][] pixels = this.getPixels2D();
+		Picture result = new Picture(pixels.length, pixels[0].length);
+		Pixel[][] resultPixels = result.getPixels2D();
+		int colSize = size;
+		int rowSize = size;
+		int redColor = 0;
+		int greenColor = 0;
+		int blueColor = 0;
+		int num = 0;
+		for (int row = 0; row < pixels.length; row+=rowSize)
+        {
+			for (int col = 0; col < pixels[row].length; col+=colSize)
+			{
+				if(row - size < 0)
+				{
+					for(int x = size/2; x >= 0; x--)
+					{
+						if(row - x >= 0)
+						{
+							rowSize = x;
+							x = 1;
+						}
+					}
+				}
+				if(col - size < 0)
+				{
+					for(int x = size/2; x >= 0; x--)
+					{
+						
+						if(col - x >= 0)
+						{
+							colSize = x;
+							System.out.println(colSize + " "  + x);
+							x = 1;
+						}
+					}
+				}
+				for(int a = colSize; a >= 0; a--)
+				{
+					for(int b = colSize; b >= 0; b--)
+					{
+						System.out.print(colSize);
+						Pixel pixel = pixels[row - a][col - b];
+						greenColor+=pixel.getGreen();
+						blueColor+=pixel.getBlue();
+						redColor+=pixel.getRed();
+						num++;
+					}
+				}
+				if(row + size > (pixels.length -1) )
+				{
+					for(int x = size/2; x >= 0; x--)
+					{
+						if(row + x < pixels.length)
+						{
+							rowSize = x;
+							x = 1;
+						}
+					}
+				}
+				if(col + size > (pixels.length -1) )
+				{
+					for(int x = size/2; x >= 0; x--)
+					{
+						if(col + x < pixels.length)
+						{
+							colSize = x;
+							x = 1;
+						}
+					}
+				}
+				for(int a = colSize; a >= 0; a--)
+				{
+					for(int b = colSize; b >= 0; b--)
+					{
+						Pixel pixel = pixels[row + a][col + b];
+						greenColor+=pixel.getGreen();
+						blueColor+=pixel.getBlue();
+						redColor+=pixel.getRed();
+						num++;
+					}
+				}
+				resultPixels[row][col].setRed(redColor/num);
+				resultPixels[row][col].setGreen(greenColor/num);
+				resultPixels[row][col].setBlue(blueColor/num);
+				
+			}
+		}
+		return result;
+	}
+	  
+			
   
   /** copy from the passed fromPic to the
     * specified startRow and startCol in the

@@ -79,8 +79,16 @@ public class PictureTester
   {
 	Picture swan = new Picture("images/swan.jpg");
 	swan.explore();
-    swan.pixelate(2);
+    swan.pixelate(10);
     swan.explore();
+  }
+  
+   public static void testBlur()
+  {
+	Picture beach = new Picture("images/beach.jpg");
+	beach.explore();
+    Picture newBeach = beach.blur(10);
+    newBeach.explore();
   }
   
   
@@ -114,6 +122,7 @@ public class PictureTester
     //testSetRedToHalfValueInTopHalf();
     //testClearBlueOverValue(200);
     //testGetAverageForColumn(0);
-    testPixelate();
+    //testPixelate();
+    testBlur();
   }
 }
