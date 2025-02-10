@@ -188,164 +188,213 @@ public class Picture extends SimplePicture
   /** To pixelate by dividing area into size x size.
    * @param size Side length of square area to pixelate.
    */
-  public void pixelate(int size) 
-  {
-	Pixel[][] pixels = this.getPixels2D();
-	int redColor= 0;
-	int blueColor = 0;
-	int greenColor = 0;
-	int colSize = size;
-	int rowSize = size;
-    for (int row = 0; row < pixels.length; row+=rowSize)
-    {
-		if(row + size > pixels.length)
-		 {
-			 for(int a = 1; a < size; a++)
-			 {
-				 if(row + (size - a) < pixels.length)
-				 {
-					 rowSize = size - a;
-					 a = size -1;
-				 }
-			 }
-	      }
-      for (int col = 0; col < pixels[row].length; col+=colSize)
-      {
-		redColor = 0;
-		blueColor = 0;
-		greenColor = 0;
-		 if(col + size > pixels[row].length)
-		 {
-			 for(int a = 1; a < size; a++)
-			 {
-				 if(col + (size - a) < pixels[row].length)
-				 {
-					 colSize = size - a;
-					 a = size -1;
-				 }
-			 }
-		 }
-		 for (int x = 0; x < rowSize; x++)
-		 {
-			for(int y= 0; y < colSize; y++)
-			{
-				Pixel pixel = pixels[row + x][col + y];
-				redColor+=pixel.getRed();
-				blueColor+=pixel.getBlue();
-				greenColor+=pixel.getGreen();
-			}
-		 }
-		 for (int x = 0; x < rowSize; x++)
-		 {
-			for(int y= 0; y < colSize; y++)
-			{
-				pixels[row + x][col+y].setRed(redColor/((rowSize)*(colSize)));
-				pixels[row + x][col+y].setGreen(greenColor/((rowSize)*(colSize)));
-				pixels[row + x][col+y].setBlue(blueColor/((rowSize)*(colSize)));
-			}
-		 }
-      }
-    } 
-  }
+  public void pixelate(int size) {
+    Pixel[][] pixels = this.getPixels2D();
+    for (int row = 0; row < pixels.length; row += size) {
+        for (int col = 0; col < pixels[row].length; col += size) {
+            int redColor = 0, greenColor = 0, blueColor = 0;
+            int pixelCount = 0;
+
+            // Determine actual block size (handles edges correctly)
+            int rowLimit = Math.min(row + size, pixels.length);
+            int colLimit = Math.min(col + size, pixels[row].length);
+
+            // Compute average color for the block
+            for (int r = row; r < rowLimit; r++) {
+                for (int c = col; c < colLimit; c++) {
+                    Pixel pixel = pixels[r][c];
+                    redColor += pixel.getRed();
+                    greenColor += pixel.getGreen();
+                    blueColor += pixel.getBlue();
+                    pixelCount++;
+                }
+            }
+
+            int avgRed = redColor / pixelCount;
+            int avgGreen = greenColor / pixelCount;
+            int avgBlue = blueColor / pixelCount;
+
+            for (int r = row; r < rowLimit; r++) {
+                for (int c = col; c < colLimit; c++) {
+                    pixels[r][c].setRed(avgRed);
+                    pixels[r][c].setGreen(avgGreen);
+                    pixels[r][c].setBlue(avgBlue);
+                }
+            }
+        }
+    }
+}
+
 	/** Method that blurs the picture
 	* @param size Blur size, greater is more blur
 	* @return Blurred picture
 	*/
-	public Picture blur(int size)
-	{
-		Pixel[][] pixels = this.getPixels2D();
-		Picture result = new Picture(pixels.length, pixels[0].length);
-		Pixel[][] resultPixels = result.getPixels2D();
-		int colSize = size;
-		int rowSize = size;
-		int redColor = 0;
-		int greenColor = 0;
-		int blueColor = 0;
-		int num = 0;
-		for (int row = 0; row < pixels.length; row+=rowSize)
-        {
-			for (int col = 0; col < pixels[row].length; col+=colSize)
-			{
-				if(row - size < 0)
-				{
-					for(int x = size/2; x >= 0; x--)
-					{
-						if(row - x >= 0)
-						{
-							rowSize = x;
-							x = 1;
-						}
-					}
-				}
-				if(col - size < 0)
-				{
-					for(int x = size/2; x >= 0; x--)
-					{
-						
-						if(col - x >= 0)
-						{
-							colSize = x;
-							System.out.println(colSize + " "  + x);
-							x = 1;
-						}
-					}
-				}
-				for(int a = colSize; a >= 0; a--)
-				{
-					for(int b = colSize; b >= 0; b--)
-					{
-						System.out.print(colSize);
-						Pixel pixel = pixels[row - a][col - b];
-						greenColor+=pixel.getGreen();
-						blueColor+=pixel.getBlue();
-						redColor+=pixel.getRed();
-						num++;
-					}
-				}
-				if(row + size > (pixels.length -1) )
-				{
-					for(int x = size/2; x >= 0; x--)
-					{
-						if(row + x < pixels.length)
-						{
-							rowSize = x;
-							x = 1;
-						}
-					}
-				}
-				if(col + size > (pixels.length -1) )
-				{
-					for(int x = size/2; x >= 0; x--)
-					{
-						if(col + x < pixels.length)
-						{
-							colSize = x;
-							x = 1;
-						}
-					}
-				}
-				for(int a = colSize; a >= 0; a--)
-				{
-					for(int b = colSize; b >= 0; b--)
-					{
-						Pixel pixel = pixels[row + a][col + b];
-						greenColor+=pixel.getGreen();
-						blueColor+=pixel.getBlue();
-						redColor+=pixel.getRed();
-						num++;
-					}
-				}
-				resultPixels[row][col].setRed(redColor/num);
-				resultPixels[row][col].setGreen(greenColor/num);
-				resultPixels[row][col].setBlue(blueColor/num);
-				
-			}
-		}
-		return result;
-	}
-	  
-			
+  public Picture blur(int size) {
+    Pixel[][] pixels = this.getPixels2D();
+    Picture result = new Picture(pixels.length, pixels[0].length);
+    Pixel[][] resultPixels = result.getPixels2D();
+
+    int radius = size / 2;
+
+    for (int row = 0; row < pixels.length; row++) {
+        for (int col = 0; col < pixels[row].length; col++) {
+            int redColor = 0, greenColor = 0, blueColor = 0, num = 0;
+
+            int startRow = Math.max(0, row - radius);
+            int endRow = Math.min(pixels.length - 1, row + radius);
+            int startCol = Math.max(0, col - radius);
+            int endCol = Math.min(pixels[row].length - 1, col + radius);
+
+            for (int r = startRow; r <= endRow; r++) {
+                for (int c = startCol; c <= endCol; c++) {
+                    Pixel pixel = pixels[r][c];
+                    redColor += pixel.getRed();
+                    greenColor += pixel.getGreen();
+                    blueColor += pixel.getBlue();
+                    num++;
+                }
+            }
+            resultPixels[row][col].setRed(redColor / num);
+            resultPixels[row][col].setGreen(greenColor / num);
+            resultPixels[row][col].setBlue(blueColor / num);
+        }
+    }
+      return result;
+  }
+
+   /** Method that enhances a picture by getting average Color around
+    * a pixel then applies the following formula:
+    *
+    * pixelColor <- 2 * currentValue - averageValue
+    *
+    * size is the area to sample for blur.
+    *
+    * @param size Larger means more area to average around pixel
+    * and longer compute time.
+    * @return enhanced picture
+    */
+    public Picture enhance(int size)
+    {
+      Pixel[][] pixels = this.getPixels2D();
+      Picture result = new Picture(pixels.length, pixels[0].length);
+      Pixel[][] resultPixels = result.getPixels2D();
+      int radius = size / 2;
+      for (int row = 0; row < pixels.length; row++) {
+          for (int col = 0; col < pixels[row].length; col++) {
+              int redColor = 0, greenColor = 0, blueColor = 0, num = 0;
+
+              int startRow = Math.max(0, row - radius);
+              int endRow = Math.min(pixels.length - 1, row + radius);
+              int startCol = Math.max(0, col - radius);
+              int endCol = Math.min(pixels[row].length - 1, col + radius);
+
+              for (int r = startRow; r <= endRow; r++) {
+                for (int c = startCol; c <= endCol; c++) {
+                    Pixel pixel = pixels[r][c];
+                    redColor += pixel.getRed();
+                    greenColor += pixel.getGreen();
+                    blueColor += pixel.getBlue();
+                    num++;
+                }
+              }
+            resultPixels[row][col].setRed((2 * pixels[row][col].getRed()) - (redColor / num));
+            resultPixels[row][col].setGreen((2 * pixels[row][col].getGreen()) - (greenColor / num));
+            resultPixels[row][col].setBlue((2 * pixels[row][col].getBlue()) - (blueColor / num));
+          }
+        }
+        return result;
+    }
+
+    public Picture swapLeftRight()
+    {
+      Pixel[][] pixels = this.getPixels2D();
+      Picture result = new Picture(pixels.length, pixels[0].length);
+      Pixel[][] resultPixels = result.getPixels2D();
   
+      for (int row = 0; row < pixels.length; row++) {
+          for (int col = 0; col < pixels[0].length; col++) {
+              int newColumn = (col + pixels[0].length / 2) % pixels[0].length;
+              resultPixels[row][newColumn].setColor(pixels[row][col].getColor());
+          }
+      }
+      return result;
+    }	
+
+    /** <Description here>
+     * @param shiftCount The number of pixels to shift to the right
+     * @param steps The number of steps
+     * @return The picture with pixels shifted in stair steps
+     */ 
+    public Picture stairStep(int shiftCount, int steps) {
+      Pixel[][] pixels = this.getPixels2D();
+      Picture result = new Picture(pixels.length, pixels[0].length);
+      Pixel[][] resultPixels = result.getPixels2D();
+  
+      int stepHeight = pixels.length / steps; 
+  
+      for (int row = 0; row < pixels.length; row++) {
+          int shiftAmount = (row / stepHeight) * shiftCount; 
+          for (int col = 0; col < pixels[0].length; col++) {
+              int newColumn = (col + shiftAmount) % pixels[0].length; 
+              resultPixels[row][newColumn].setColor(pixels[row][col].getColor());
+          }
+      }
+  
+      return result;
+    }
+
+    public Picture liquify(int maxHeight) {   
+      Pixel[][] pixels = this.getPixels2D();
+      Picture result = new Picture(pixels.length, pixels[0].length);
+      Pixel[][] resultPixels = result.getPixels2D();
+      int bellWidth = pixels.length / 4;
+      for (int row = 0; row < pixels.length; row++) {
+          double exponent = Math.pow(row - pixels.length / 2.0, 2) / (2.0 * Math.pow(bellWidth, 2));
+          int rightShift = (int) (maxHeight * Math.exp(-exponent)); 
+
+          for (int col = 0; col < pixels[0].length; col++) {
+              int newColumn = (col + rightShift) % pixels[0].length; 
+              resultPixels[row][newColumn].setColor(pixels[row][col].getColor());
+          }
+      }
+      return result;
+    }
+
+    /**
+     * Applies a wavy effect by shifting pixels horizontally in a sinusoidal pattern.
+     * This creates an oscillating distortion across the entire image.
+     * 
+     * @param amplitude The maximum shift of pixels (controls distortion intensity)
+     * @return A new Picture object with the wavy effect applied
+     */
+    public Picture wavy(int amplitude) {
+      Pixel[][] pixels = this.getPixels2D();
+      int width = pixels[0].length;
+      int height = pixels.length;
+  
+      Picture result = new Picture(height, width);
+      Pixel[][] resultPixels = result.getPixels2D();
+
+      double frequency = 0.05; 
+      double phaseShift = 0;   
+
+      for (int row = 0; row < height; row++) {
+          int rightShift = (int) (amplitude * Math.sin(2 * Math.PI * frequency * row + phaseShift));
+
+          for (int col = 0; col < width; col++) {
+              int newColumn = (col + rightShift + width) % width; // Wrap pixels around
+              resultPixels[row][newColumn].setColor(pixels[row][col].getColor());
+          }
+      }
+
+      return result;
+    }
+
+
+  
+
+          
+ 		
   /** copy from the passed fromPic to the
     * specified startRow and startCol in the
     * current picture

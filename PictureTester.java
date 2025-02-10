@@ -61,8 +61,8 @@ public class PictureTester
   
   public static void testGrayScale()
   {
-	Picture beach = new Picture("images/beach.jpg");
-	beach.explore();
+	  Picture beach = new Picture("images/beach.jpg");
+	  beach.explore();
     beach.grayscale();
     beach.explore();
   }
@@ -83,13 +83,58 @@ public class PictureTester
     swan.explore();
   }
   
-   public static void testBlur()
+  public static void testBlur()
   {
-	Picture beach = new Picture("images/beach.jpg");
-	beach.explore();
-    Picture newBeach = beach.blur(10);
+	  Picture beach = new Picture("images/beach.jpg");
+	  beach.explore();
+    Picture newBeach = beach.blur(11);
     newBeach.explore();
   }
+
+  public static void testEnhance()
+  {
+    Picture water = new Picture("images/water.jpg");
+    water.explore();
+    Picture newWater = water.enhance(21);
+    newWater.explore();
+  }
+  
+  public static void testSwapLeftRight()
+  {
+    Picture redMotorcycle = new Picture("images/redMotorcycle.jpg");
+    redMotorcycle.explore();
+    Picture newRedMotorcycle = redMotorcycle.swapLeftRight();
+    newRedMotorcycle.explore();
+  }
+
+  public static void testStairStep()
+  {
+    Picture redMotorcycle = new Picture("images/redMotorcycle.jpg");
+    redMotorcycle.explore();
+    Picture newRedMotorcycle = redMotorcycle.stairStep(1,400);
+    newRedMotorcycle.explore();
+  }
+
+  public static void testLiquify()
+  {
+    Picture redMotorcycle = new Picture("images/redMotorcycle.jpg");
+    redMotorcycle.explore();
+    Picture newRedMotorcycle = redMotorcycle.liquify(150);
+    newRedMotorcycle.explore();
+  }
+
+  public static void testWavy()
+  {
+    Picture swan = new Picture("images/swan.jpg");
+    swan.explore();
+    Picture newSwan = swan.wavy(5);
+    newSwan.explore();
+  }
+
+
+  
+  
+  
   
   
   
@@ -123,6 +168,11 @@ public class PictureTester
     //testClearBlueOverValue(200);
     //testGetAverageForColumn(0);
     //testPixelate();
-    testBlur();
+    //testBlur();
+    //testEnhance();
+    //testSwapLeftRight();
+    //testStairStep();
+    //testLiquify();
+    testWavy();
   }
 }
