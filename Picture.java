@@ -11,7 +11,8 @@ import java.util.List; // resolves problem with java.awt.List and java.util.List
  * SimplePicture and allows the student to add functionality to
  * the Picture class.  
  * 
- * @author Barbara Ericson ericson@cc.gatech.edu
+ * @author Barbara Ericson ericson@cc.gatech.edu and Ananya Kotla
+ * @since 
  */
 public class Picture extends SimplePicture 
 {
@@ -112,6 +113,7 @@ public class Picture extends SimplePicture
     }
   }
   
+  /** Method to negate all the pixels on the pictures*/
   public void negate()
   {
     Pixel[][] pixels = this.getPixels2D();
@@ -126,6 +128,7 @@ public class Picture extends SimplePicture
     }
   }
   
+  /** Method to turn the picture into shades of gray*/
   public void grayscale()
   {
     Pixel[][] pixels = this.getPixels2D();
@@ -133,7 +136,8 @@ public class Picture extends SimplePicture
     {
       for (Pixel pixelObj : rowArray)
       {
-		int average = (pixelObj.getRed() + pixelObj.getBlue() + pixelObj.getGreen())/3;
+		int average = (pixelObj.getRed() + pixelObj.getBlue() + 
+												pixelObj.getGreen())/3;
         pixelObj.setRed(average);
         pixelObj.setGreen(average);
         pixelObj.setBlue(average);
@@ -194,12 +198,8 @@ public class Picture extends SimplePicture
         for (int col = 0; col < pixels[row].length; col += size) {
             int redColor = 0, greenColor = 0, blueColor = 0;
             int pixelCount = 0;
-
-            // Determine actual block size (handles edges correctly)
             int rowLimit = Math.min(row + size, pixels.length);
             int colLimit = Math.min(col + size, pixels[row].length);
-
-            // Compute average color for the block
             for (int r = row; r < rowLimit; r++) {
                 for (int c = col; c < colLimit; c++) {
                     Pixel pixel = pixels[r][c];
@@ -209,11 +209,9 @@ public class Picture extends SimplePicture
                     pixelCount++;
                 }
             }
-
             int avgRed = redColor / pixelCount;
             int avgGreen = greenColor / pixelCount;
             int avgBlue = blueColor / pixelCount;
-
             for (int r = row; r < rowLimit; r++) {
                 for (int c = col; c < colLimit; c++) {
                     pixels[r][c].setRed(avgRed);
@@ -223,28 +221,24 @@ public class Picture extends SimplePicture
             }
         }
     }
-}
+  }
 
-	/** Method that blurs the picture
-	* @param size Blur size, greater is more blur
-	* @return Blurred picture
+  /** Method that blurs the picture
+	* @param size 	Blur size, greater is more blur
+	* @return result 	Blurred picture
 	*/
   public Picture blur(int size) {
     Pixel[][] pixels = this.getPixels2D();
     Picture result = new Picture(pixels.length, pixels[0].length);
     Pixel[][] resultPixels = result.getPixels2D();
-
     int radius = size / 2;
-
     for (int row = 0; row < pixels.length; row++) {
         for (int col = 0; col < pixels[row].length; col++) {
             int redColor = 0, greenColor = 0, blueColor = 0, num = 0;
-
             int startRow = Math.max(0, row - radius);
             int endRow = Math.min(pixels.length - 1, row + radius);
             int startCol = Math.max(0, col - radius);
             int endCol = Math.min(pixels[row].length - 1, col + radius);
-
             for (int r = startRow; r <= endRow; r++) {
                 for (int c = startCol; c <= endCol; c++) {
                     Pixel pixel = pixels[r][c];
@@ -259,7 +253,7 @@ public class Picture extends SimplePicture
             resultPixels[row][col].setBlue(blueColor / num);
         }
     }
-      return result;
+    return result;
   }
 
    /** Method that enhances a picture by getting average Color around
@@ -271,10 +265,10 @@ public class Picture extends SimplePicture
     *
     * @param size Larger means more area to average around pixel
     * and longer compute time.
-    * @return enhanced picture
+    * @return result enhanced picture
     */
-    public Picture enhance(int size)
-    {
+   public Picture enhance(int size)
+   {
       Pixel[][] pixels = this.getPixels2D();
       Picture result = new Picture(pixels.length, pixels[0].length);
       Pixel[][] resultPixels = result.getPixels2D();
@@ -297,16 +291,24 @@ public class Picture extends SimplePicture
                     num++;
                 }
               }
-            resultPixels[row][col].setRed((2 * pixels[row][col].getRed()) - (redColor / num));
-            resultPixels[row][col].setGreen((2 * pixels[row][col].getGreen()) - (greenColor / num));
-            resultPixels[row][col].setBlue((2 * pixels[row][col].getBlue()) - (blueColor / num));
+            resultPixels[row][col].setRed((2 * pixels[row][col].getRed()) 
+														- (redColor / num));
+            resultPixels[row][col].setGreen((2 * pixels[row][col].getGreen()) 
+														- (greenColor / num));
+            resultPixels[row][col].setBlue((2 * pixels[row][col].getBlue()) 
+														- (blueColor / num));
           }
         }
         return result;
-    }
+   }
 
-    public Picture swapLeftRight()
-    {
+  /** Method that will shift pixels to the right and wrap around to the left. 
+    * The left half of the picture will end up on the right side.
+	* @param size 	Blur size, greater is more blur
+	* @return result 	Blurred picture
+	*/
+   public Picture swapLeftRight()
+   {
       Pixel[][] pixels = this.getPixels2D();
       Picture result = new Picture(pixels.length, pixels[0].length);
       Pixel[][] resultPixels = result.getPixels2D();
@@ -318,14 +320,15 @@ public class Picture extends SimplePicture
           }
       }
       return result;
-    }	
+   }	
 
-    /** <Description here>
+   /** This method will create jagged picture can be made using stair 
+     * steps of shifted pixels.
      * @param shiftCount The number of pixels to shift to the right
      * @param steps The number of steps
-     * @return The picture with pixels shifted in stair steps
+     * @return result The picture with pixels shifted in stair steps
      */ 
-    public Picture stairStep(int shiftCount, int steps) {
+   public Picture stairStep(int shiftCount, int steps) {
       Pixel[][] pixels = this.getPixels2D();
       Picture result = new Picture(pixels.length, pixels[0].length);
       Pixel[][] resultPixels = result.getPixels2D();
@@ -339,62 +342,265 @@ public class Picture extends SimplePicture
               resultPixels[row][newColumn].setColor(pixels[row][col].getColor());
           }
       }
-  
       return result;
-    }
+   }
 
-    public Picture liquify(int maxHeight) {   
+   /**
+     * This method will distort the horizontal center of the picture by 
+     * shifting pixels horizontally.
+     * 
+     * @param maxHeight The maximum shift of pixels (controls distortion intensity)
+     * @return result A new Picture object with the wavy effect applied
+     */
+   public Picture liquify(int maxHeight) {   
       Pixel[][] pixels = this.getPixels2D();
       Picture result = new Picture(pixels.length, pixels[0].length);
       Pixel[][] resultPixels = result.getPixels2D();
       int bellWidth = pixels.length / 4;
       for (int row = 0; row < pixels.length; row++) {
-          double exponent = Math.pow(row - pixels.length / 2.0, 2) / (2.0 * Math.pow(bellWidth, 2));
+          double exponent = Math.pow(row - pixels.length / 2.0, 2) / 
+											(2.0 * Math.pow(bellWidth, 2));
           int rightShift = (int) (maxHeight * Math.exp(-exponent)); 
-
           for (int col = 0; col < pixels[0].length; col++) {
               int newColumn = (col + rightShift) % pixels[0].length; 
               resultPixels[row][newColumn].setColor(pixels[row][col].getColor());
           }
       }
       return result;
-    }
+   }
 
-    /**
+   /**
      * Applies a wavy effect by shifting pixels horizontally in a sinusoidal pattern.
      * This creates an oscillating distortion across the entire image.
      * 
      * @param amplitude The maximum shift of pixels (controls distortion intensity)
-     * @return A new Picture object with the wavy effect applied
+     * @return result A new Picture object with the wavy effect applied
      */
-    public Picture wavy(int amplitude) {
+   public Picture wavy(int amplitude) {
       Pixel[][] pixels = this.getPixels2D();
       int width = pixels[0].length;
       int height = pixels.length;
   
       Picture result = new Picture(height, width);
       Pixel[][] resultPixels = result.getPixels2D();
-
-      double frequency = 0.05; 
       double phaseShift = 0;   
-
       for (int row = 0; row < height; row++) {
-          int rightShift = (int) (amplitude * Math.sin(2 * Math.PI * frequency * row + phaseShift));
+          int rightShift = (int) (amplitude * Math.sin(2 * (Math.PI/100) * row + phaseShift));
 
           for (int col = 0; col < width; col++) {
-              int newColumn = (col + rightShift + width) % width; // Wrap pixels around
+              int newColumn = (col + rightShift + width) % width; 
               resultPixels[row][newColumn].setColor(pixels[row][col].getColor());
           }
       }
-
       return result;
-    }
+  }
 
+
+  public Picture greenScreen() {
+    // Load background image
+    Picture bkgnd = new Picture("greenScreenImages/IndoorHouseLibraryBackground.jpg");
+    Pixel[][] bkgndPixels = bkgnd.getPixels2D();
+    
+    // Load green screen images
+    Picture cat = new Picture("greenScreenImages/kitten1GreenScreen.jpg");
+    Pixel[][] catPixels = cat.getPixels2D();
+    Picture newCat = resize(catPixels, getWidth()/4, getHeight()/3);
+    catPixels = newCat.getPixels2D();
+    
+    
+    Picture mouse = new Picture("greenScreenImages/mouse1GreenScreen.jpg");
+    Pixel[][] mousePixels = mouse.getPixels2D();
+    Picture newMouse = resize(mousePixels, getWidth()/6, getHeight()/8);
+    mousePixels = newMouse.getPixels2D();
+
+    
+    // Define green color threshold
+    int greenThreshold = 150;
+    double ratioThreshold = 1.5;
+
+    int catRowOffset = 365; // Lower placement
+    int catColOffset = 510; // Shift right
+    for (int row = 0; row < catPixels.length; row++) {
+        for (int col = 0; col < catPixels[row].length; col++) {
+            Pixel catPixel = catPixels[row][col];
+            int red = catPixel.getRed();
+            int green = catPixel.getGreen();
+            int blue = catPixel.getBlue();
+            
+            if (!(green > greenThreshold && green > red * ratioThreshold && green > blue * ratioThreshold)) {
+                bkgndPixels[row + catRowOffset][col + catColOffset].setColor(catPixel.getColor());
+            }
+        }
+    }
+    
+    // Overlay mouse image onto background (adjusted position to sit on couch)
+    int mouseRowOffset = 360; // Placed on couch
+    int mouseColOffset = 290; // Adjusted position
+    for (int row = 0; row < mousePixels.length; row++) {
+        for (int col = 0; col < mousePixels[row].length; col++) {
+            Pixel mousePixel = mousePixels[row][col];
+            int red = mousePixel.getRed();
+            int green = mousePixel.getGreen();
+            int blue = mousePixel.getBlue();
+            
+            if (!(green > greenThreshold && green > red * ratioThreshold && green > blue * ratioThreshold)) {
+                bkgndPixels[row + mouseRowOffset][col + mouseColOffset].setColor(mousePixel.getColor());
+            }
+        }
+    }
+    return bkgnd;
+  }
+
+  public Picture resize(Pixel[][] oldPixels, int newWidth, int newHeight) {
+    int oldWidth = oldPixels[0].length;
+    int oldHeight = oldPixels.length;
+
+    Picture resizedPicture = new Picture(newHeight, newWidth);
+    // Create a new pixel array for the resized image
+    Pixel[][] newPixels = resizedPicture.getPixels2D();
+
+    // Calculate scaling factors
+    double xScale = (double) oldWidth / newWidth;
+    double yScale = (double) oldHeight / newHeight;
+
+    // Resize the image
+    for (int newX = 0; newX < newWidth; newX++) {
+        for (int newY = 0; newY < newHeight; newY++) {
+            // Find the corresponding pixel in the original image
+            int oldX = (int) (newX * xScale);
+            int oldY = (int) (newY * yScale);
+
+            // Copy pixel data
+            System.out.println(newY);
+            System.out.println(newX);
+            System.out.println(oldY);
+            System.out.println(oldX);
+            newPixels[newY][newX].setColor(oldPixels[oldY][oldX].getColor());
+        }
+    }
+    return resizedPicture;
+}
+
+  public Picture rotate(double angle) {
+    // Get the 2D pixel array
+    Pixel[][] pixels = this.getPixels2D();
+    int width = pixels[0].length;
+    int height = pixels.length;
+    
+    // Calculate the center of the image
+    int centerX = (width) / 2;
+    int centerY = (height) / 2;
+
+    int newWidth = (int)(width * Math.abs(Math.cos(angle)) + height * Math.abs(Math.sin(angle)));
+    int newHeight = (int)(width * Math.abs(Math.sin(angle)) + height * Math.abs(Math.cos(angle)));
+        
+    
+    Picture rotatedImage = new Picture(newHeight, newWidth);
+    Pixel[][] rotatedPixels = rotatedImage.getPixels2D();
+    
+    // Fill in the rotated pixels
+    for (int row = 0; row < height; row++) {
+        for (int col = 0; col < width; col++) {
+            
+          int x0 = col - centerX;
+                int y0 = row - centerY;
+            
+            
+            // Rotate the coordinates
+            int x1 = (int)(x0 * Math.cos(angle) - y0 * Math.sin(angle));
+            int y1 = (int)(x0 * Math.sin(angle) + y0 * Math.cos(angle));
+            
+    
+            x1 += (newWidth / 2);
+            y1 += (newHeight / 2);
+    
+  
+            // Ensure that the pixel is within the bounds of the new image
+            if (x1 >= 0 && x1 < newWidth && y1 >= 0 && y1 < newHeight)
+            {
+              rotatedPixels[y1][x1].setColor(pixels[row][col].getColor()); // Copy the pixel
+            }
+            
+        }
+      }
+
+      for (int row = 1; row < newHeight -1 ; row++) {
+        for (int col = 1; col < newWidth -1; col++) {
+            Pixel pixel = rotatedPixels[row][col];
+            if (pixel.getColor().equals(new Color(255, 255, 255))) {
+              if(!hasWhiteNeighbor(rotatedPixels, row, col, newHeight, newWidth))
+              {
+                Color nearestColor = findNearestColor(rotatedPixels, row, col, newHeight, newWidth);
+                pixel.setColor(nearestColor);
+              }
+            }
+        }
+    }
+    
+    // Return the rotated image
+    return rotatedImage;
+  } 
+
+  private Color findNearestColor(Pixel[][] pixels, int row, int col, int height, int width) {
+    Color nearestColor = new Color(255, 255, 255); // Default (white) color
+    int minDistance = Integer.MAX_VALUE;
+    
+    // Check the surrounding pixels (8 neighbors)
+    for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+            int newRow = row + i;
+            int newCol = col + j;
+            
+            // Ensure we're inside the image bounds
+            if (newRow >= 0 && newRow < height && newCol >= 0 && newCol < width) {
+                Pixel neighbor = pixels[newRow][newCol];
+                if (!neighbor.getColor().equals(new Color(255, 255, 255))) {  // If it's not white (filled pixel)
+                    int distance = colorDistance(nearestColor, neighbor.getColor());
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        nearestColor = neighbor.getColor();
+                    }
+                }
+            }
+        }
+    }
+    
+    return nearestColor;
+}
+
+private boolean hasWhiteNeighbor(Pixel[][] pixels, int row, int col, int height, int width) {
+  int[][] directions = {
+      {-1, -1}, {-1, 0}, {-1, 1},
+      { 0, -1},         { 0, 1},
+      { 1, -1}, { 1, 0}, { 1, 1}
+  };
+  int counter = 0;
+
+  for (int[] dir : directions) {
+      int newRow = row + dir[0];
+      int newCol = col + dir[1];
+
+      if (newRow >= 0 && newRow < height && newCol >= 0 && newCol < width) {
+          if (pixels[newRow][newCol].getColor().equals(new Color(255, 255,255))) {
+              counter++; // At least one neighbor is white
+          }
+      }
+  }
+  if(counter > 3)
+    return true;
+  return false; // No white neighbors
+}
 
   
 
-          
- 		
+// Helper method to calculate the distance between two colors (used in nearest neighbor filling)
+private int colorDistance(Color color1, Color color2) {
+    int rDiff = color1.getRed() - color2.getRed();
+    int gDiff = color1.getGreen() - color2.getGreen();
+    int bDiff = color1.getBlue() - color2.getBlue();
+    return rDiff * rDiff + gDiff * gDiff + bDiff * bDiff;  
+}
+
   /** copy from the passed fromPic to the
     * specified startRow and startCol in the
     * current picture
@@ -469,6 +675,33 @@ public class Picture extends SimplePicture
       }
     }
   }
+
+  /** Method that creates an edge detected black/white picture
+    * @param threshold threshold as determined by Pixel’s colorDistance metho
+    * @return edge detected picture
+    */
+  public Picture edgeDetectionBelow(int threshold) 
+  {
+    Pixel[][] pixels = this.getPixels2D();
+    Picture result = new Picture(pixels.length, pixels[0].length);
+    Pixel[][] resultPixels = result.getPixels2D();
+    for (int row = 0; row < pixels.length - 1; row++) { // Ensure we don't go
+        for (int col = 0; col < pixels[row].length; col++) {
+            Pixel currentPixel = pixels[row][col];
+            Pixel belowPixel = pixels[row + 1][col];
+            if (currentPixel.colorDistance(belowPixel.getColor()) > 
+                threshold) 
+              resultPixels[row][col].setColor(Color.BLACK);
+            else 
+              resultPixels[row][col].setColor(Color.WHITE);
+        }
+      }
+      for (int col = 0; col < pixels[0].length; col++) {
+        resultPixels[pixels.length - 1][col].setColor(Color.WHITE);
+      }
+    return result;
+  }
+  
   
   
   /* Main method for testing - each class in Java can have a main 

@@ -131,6 +131,35 @@ public class PictureTester
     newSwan.explore();
   }
 
+  public static void testEdgeDetectionBelow()
+  {
+    Picture swan = new Picture("images/swan.jpg");
+    swan.explore();
+    Picture newSwan = swan.edgeDetectionBelow(10);
+    newSwan.explore();
+  }
+
+  /** Method to test greenScreen */
+  public static void testGreenScreen()
+  {
+    // choose any picture to start since it will *not* be used
+    Picture pic = new Picture("images/beach.jpg");
+    Picture gScreen = pic.greenScreen();
+    gScreen.explore();
+  } 
+
+    /** Method to test greenScreen */
+  public static void testRotate()
+  {
+    
+    Picture pic = new Picture("images/beach.jpg");
+    pic.explore();
+    Picture newPic = pic.rotate(Math.PI / 4);
+    newPic.explore();
+  }
+
+    
+
 
   
   
@@ -173,6 +202,9 @@ public class PictureTester
     //testSwapLeftRight();
     //testStairStep();
     //testLiquify();
-    testWavy();
+    //testWavy();
+    //testEdgeDetectionBelow();
+    testGreenScreen();
+    //testRotate();
   }
 }
