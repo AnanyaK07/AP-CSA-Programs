@@ -396,46 +396,42 @@ public class Picture extends SimplePicture
   }
 
 
+  /** Method that creates a green screen picture
+	* @return bkgnd		green screen picture
+	*/
   public Picture greenScreen() {
-    // Load background image
     Picture bkgnd = new Picture("greenScreenImages/IndoorHouseLibraryBackground.jpg");
     Pixel[][] bkgndPixels = bkgnd.getPixels2D();
     
-    // Load green screen images
     Picture cat = new Picture("greenScreenImages/kitten1GreenScreen.jpg");
     Pixel[][] catPixels = cat.getPixels2D();
     Picture newCat = resize(catPixels, getWidth()/4, getHeight()/3);
     catPixels = newCat.getPixels2D();
-    
     
     Picture mouse = new Picture("greenScreenImages/mouse1GreenScreen.jpg");
     Pixel[][] mousePixels = mouse.getPixels2D();
     Picture newMouse = resize(mousePixels, getWidth()/6, getHeight()/8);
     mousePixels = newMouse.getPixels2D();
 
-    
-    // Define green color threshold
     int greenThreshold = 150;
     double ratioThreshold = 1.5;
 
-    int catRowOffset = 365; // Lower placement
-    int catColOffset = 510; // Shift right
+    int catRowOffset = 365; 
+    int catColOffset = 510; 
     for (int row = 0; row < catPixels.length; row++) {
         for (int col = 0; col < catPixels[row].length; col++) {
             Pixel catPixel = catPixels[row][col];
             int red = catPixel.getRed();
             int green = catPixel.getGreen();
             int blue = catPixel.getBlue();
-            
             if (!(green > greenThreshold && green > red * ratioThreshold && green > blue * ratioThreshold)) {
                 bkgndPixels[row + catRowOffset][col + catColOffset].setColor(catPixel.getColor());
             }
         }
     }
     
-    // Overlay mouse image onto background (adjusted position to sit on couch)
-    int mouseRowOffset = 360; // Placed on couch
-    int mouseColOffset = 290; // Adjusted position
+    int mouseRowOffset = 360; 
+    int mouseColOffset = 290; 
     for (int row = 0; row < mousePixels.length; row++) {
         for (int col = 0; col < mousePixels[row].length; col++) {
             Pixel mousePixel = mousePixels[row][col];
@@ -451,79 +447,60 @@ public class Picture extends SimplePicture
     return bkgnd;
   }
 
+  /** A helper method that rescales the mouse and cat pictures 
+   * @param oldPixels	 pixels of the picture getting rescaled
+   * @param newWidth	 the new width of the rescaled picture
+   * @param newHeight	 the new height of the rescaled picture
+   * @return resizedPicture 	the rescaled picture
+   */
   public Picture resize(Pixel[][] oldPixels, int newWidth, int newHeight) {
     int oldWidth = oldPixels[0].length;
     int oldHeight = oldPixels.length;
 
     Picture resizedPicture = new Picture(newHeight, newWidth);
-    // Create a new pixel array for the resized image
     Pixel[][] newPixels = resizedPicture.getPixels2D();
 
-    // Calculate scaling factors
     double xScale = (double) oldWidth / newWidth;
     double yScale = (double) oldHeight / newHeight;
-
-    // Resize the image
     for (int newX = 0; newX < newWidth; newX++) {
         for (int newY = 0; newY < newHeight; newY++) {
-            // Find the corresponding pixel in the original image
             int oldX = (int) (newX * xScale);
             int oldY = (int) (newY * yScale);
-
-            // Copy pixel data
-            System.out.println(newY);
-            System.out.println(newX);
-            System.out.println(oldY);
-            System.out.println(oldX);
             newPixels[newY][newX].setColor(oldPixels[oldY][oldX].getColor());
         }
     }
     return resizedPicture;
-}
+  }
 
+  /**
+   * Rotate image in radians, clean up "drop-out" pixels
+   * @param angle	 angle of rotation in radians
+   * @return rotatedImage	Picture that is rotated
+   */
   public Picture rotate(double angle) {
-    // Get the 2D pixel array
     Pixel[][] pixels = this.getPixels2D();
     int width = pixels[0].length;
     int height = pixels.length;
-    
-    // Calculate the center of the image
     int centerX = (width) / 2;
     int centerY = (height) / 2;
-
     int newWidth = (int)(width * Math.abs(Math.cos(angle)) + height * Math.abs(Math.sin(angle)));
     int newHeight = (int)(width * Math.abs(Math.sin(angle)) + height * Math.abs(Math.cos(angle)));
-        
-    
     Picture rotatedImage = new Picture(newHeight, newWidth);
     Pixel[][] rotatedPixels = rotatedImage.getPixels2D();
-    
-    // Fill in the rotated pixels
     for (int row = 0; row < height; row++) {
         for (int col = 0; col < width; col++) {
-            
-          int x0 = col - centerX;
-                int y0 = row - centerY;
-            
-            
-            // Rotate the coordinates
+            int x0 = col - centerX;
+            int y0 = row - centerY;
             int x1 = (int)(x0 * Math.cos(angle) - y0 * Math.sin(angle));
             int y1 = (int)(x0 * Math.sin(angle) + y0 * Math.cos(angle));
-            
-    
             x1 += (newWidth / 2);
             y1 += (newHeight / 2);
-    
-  
-            // Ensure that the pixel is within the bounds of the new image
             if (x1 >= 0 && x1 < newWidth && y1 >= 0 && y1 < newHeight)
             {
-              rotatedPixels[y1][x1].setColor(pixels[row][col].getColor()); // Copy the pixel
+              rotatedPixels[y1][x1].setColor(pixels[row][col].getColor()); 
             }
-            
         }
       }
-
       for (int row = 1; row < newHeight -1 ; row++) {
         for (int col = 1; col < newWidth -1; col++) {
             Pixel pixel = rotatedPixels[row][col];
@@ -536,25 +513,27 @@ public class Picture extends SimplePicture
             }
         }
     }
-    
-    // Return the rotated image
     return rotatedImage;
   } 
 
-  private Color findNearestColor(Pixel[][] pixels, int row, int col, int height, int width) {
-    Color nearestColor = new Color(255, 255, 255); // Default (white) color
+  /** Helper method that fills in the pixels that were dropped out 
+   * @param pixels	 the pixels of the picture
+   * @param row	     the dropout pixel's row
+   * @param col	     the dropout pixel's column
+   * @param height	 the height of the picture
+   * @param width	 the width of the picture
+   * @return the closest's pixel's color to the dropout pixel
+   */
+  public Color findNearestColor(Pixel[][] pixels, int row, int col, int height, int width) {
+    Color nearestColor = new Color(255, 255, 255); 
     int minDistance = Integer.MAX_VALUE;
-    
-    // Check the surrounding pixels (8 neighbors)
     for (int i = -1; i <= 1; i++) {
         for (int j = -1; j <= 1; j++) {
             int newRow = row + i;
             int newCol = col + j;
-            
-            // Ensure we're inside the image bounds
             if (newRow >= 0 && newRow < height && newCol >= 0 && newCol < width) {
                 Pixel neighbor = pixels[newRow][newCol];
-                if (!neighbor.getColor().equals(new Color(255, 255, 255))) {  // If it's not white (filled pixel)
+                if (!neighbor.getColor().equals(new Color(255, 255, 255))) {  
                     int distance = colorDistance(nearestColor, neighbor.getColor());
                     if (distance < minDistance) {
                         minDistance = distance;
@@ -564,42 +543,55 @@ public class Picture extends SimplePicture
             }
         }
     }
-    
-    return nearestColor;
-}
+	return nearestColor;
+  }
 
-private boolean hasWhiteNeighbor(Pixel[][] pixels, int row, int col, int height, int width) {
-  int[][] directions = {
+  /** helper method that checks if the white pixel has any white pixels
+   * that neighbor it. If it does, then we know it's part of the background,
+   * not the picture itself. 
+   * @param pixels	 the pixels of the picture
+   * @param row	     the dropout pixel's row
+   * @param col	     the dropout pixel's column
+   * @param height	 the height of the picture
+   * @param width	 the width of the picture
+   * @return true if it's a dropout pixel, false if it's not
+   */
+  public boolean hasWhiteNeighbor(Pixel[][] pixels, int row, int col, int height, int width) {
+	int[][] directions = {
       {-1, -1}, {-1, 0}, {-1, 1},
       { 0, -1},         { 0, 1},
       { 1, -1}, { 1, 0}, { 1, 1}
-  };
-  int counter = 0;
+	};
+	int counter = 0;
+	for (int[] dir : directions) {
+		int newRow = row + dir[0];
+		int newCol = col + dir[1];
 
-  for (int[] dir : directions) {
-      int newRow = row + dir[0];
-      int newCol = col + dir[1];
-
-      if (newRow >= 0 && newRow < height && newCol >= 0 && newCol < width) {
-          if (pixels[newRow][newCol].getColor().equals(new Color(255, 255,255))) {
-              counter++; // At least one neighbor is white
-          }
-      }
-  }
-  if(counter > 3)
-    return true;
-  return false; // No white neighbors
+		if (newRow >= 0 && newRow < height && newCol >= 0 && newCol < width) {
+			if (pixels[newRow][newCol].getColor().equals(new Color(255, 255,255))) {
+				counter++; 
+			}
+		}
+	}
+	if(counter > 3)
+		return true;
+	return false; 
 }
 
   
 
-// Helper method to calculate the distance between two colors (used in nearest neighbor filling)
-private int colorDistance(Color color1, Color color2) {
-    int rDiff = color1.getRed() - color2.getRed();
-    int gDiff = color1.getGreen() - color2.getGreen();
-    int bDiff = color1.getBlue() - color2.getBlue();
-    return rDiff * rDiff + gDiff * gDiff + bDiff * bDiff;  
-}
+  /** Helper method to calculate the distance between two colors 
+   * (used in nearest neighbor filling) 
+   * @param color1	 the color of one pixel
+   * @param color2	 the color of another pixel
+   * @return distance between the two colors
+   */
+  public int colorDistance(Color color1, Color color2) {
+	int rDiff = color1.getRed() - color2.getRed();
+	int gDiff = color1.getGreen() - color2.getGreen();
+	int bDiff = color1.getBlue() - color2.getBlue();
+	return rDiff * rDiff + gDiff * gDiff + bDiff * bDiff;  
+  }
 
   /** copy from the passed fromPic to the
     * specified startRow and startCol in the
@@ -677,8 +669,8 @@ private int colorDistance(Color color1, Color color2) {
   }
 
   /** Method that creates an edge detected black/white picture
-    * @param threshold threshold as determined by Pixel’s colorDistance metho
-    * @return edge detected picture
+    * @param threshold 	threshold as determined by Pixel’s colorDistance metho
+    * @return result 	edge detected picture
     */
   public Picture edgeDetectionBelow(int threshold) 
   {
