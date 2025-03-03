@@ -15,12 +15,16 @@ public class SimpleCalc {
     private ExprUtils utils; // expression utilities
     private ArrayStack<Double> valueStack;	// expression utilities
     private ArrayStack<String> operatorStack;	// operator stack
+    private List<Variable> variables;
 
 	// constructor
     public SimpleCalc() {
         utils = new ExprUtils();
         valueStack = new ArrayStack<>();
         operatorStack = new ArrayStack<>();
+        variables = new ArrayList<Variable>();
+        variables.add(e, Math.E);
+        variables.add(pi, Math.PI);
     }
 
     public static void main(String[] args) {
@@ -69,6 +73,8 @@ public class SimpleCalc {
      *    @return            a double value of the evaluated expression
      */
     public double evaluateExpression(List<String> tokens) {
+		if(tokens.get(1).equals("="))
+			String varName = tokens.get(0);
         for (int i = 0; i < tokens.size(); i++) {
             String token = tokens.get(i);
             char c = token.charAt(0);
@@ -117,6 +123,7 @@ public class SimpleCalc {
             else if (op.equals("%")) valueStack.push(a % b);
             else if (op.equals("^")) valueStack.push(Math.pow(a, b));
 		}
+		
         return valueStack.pop();
     }
 
