@@ -5,7 +5,8 @@ import java.util.ArrayList;
  * This program is a simple calculator that evaluates arithmetic expressions entered 
  * by the user. It supports basic operations such as addition, subtraction, multiplication, 
  * division, modulus, and exponentiation. The implementation uses stacks to handle operator
- * precedence and parentheses correctly.
+ * precedence and parentheses correctly. Additionally, the calculator allows users to define
+ * and store variables, supporting assignments and retrieval of values.
  *
  *	@author	Ananya Kotla
  *	@since	February 28, 2024
@@ -76,12 +77,12 @@ public class SimpleCalc {
     /**  List all identifiers/variables */
     public void listVariables() {
         System.out.println("Identifiers:");
-        for (Identifier id : variables) {
+        for (Identifier id : variables) 
             System.out.println("  " + id.getName() + " = " + id.getValue());
-        }
     }
 
     /** Assign a variable with an expression
+     * @param tokens    a List of String tokens making up an arithmetic expression
      */
     public void assignVariable(List<String> tokens) {
         String varName = tokens.get(0);
@@ -90,20 +91,21 @@ public class SimpleCalc {
         
         // Check if variable already exists
         Identifier var = findVariable(varName);
-        if (var == null) {
+        if (var == null) 
             variables.add(new Identifier(varName, value));
-        } else {
+        else
             var.setValue(value);
-        }
         System.out.println( "  " + varName + " = " + value);
     }
 
-    // Find variable by name
+    /** Find variable by name
+     * @return  the var if it already exits, otherwise null
+     */
     private Identifier findVariable(String name) {
-        for (Identifier id : variables) {
-            if (id.getName().equals(name)) {
+        for (Identifier id : variables)
+        {
+            if (id.getName().equals(name)) 
                 return id;
-            }
         }
         return null;
     }
@@ -149,7 +151,9 @@ public class SimpleCalc {
                     else if (op.equals("^")) valueStack.push(Math.pow(a, b));
                 }
                 operatorStack.push(token);
-            } else {
+            } 
+            else
+            {
                 Identifier var = findVariable(token);
                 if (var != null) 
                     valueStack.push(var.getValue());
@@ -157,7 +161,6 @@ public class SimpleCalc {
                     valueStack.push(0.0);  
             }
         }
-
         while (!operatorStack.isEmpty()) {
             String op = operatorStack.pop();
             double b = valueStack.pop();
@@ -169,7 +172,6 @@ public class SimpleCalc {
             else if (op.equals("%")) valueStack.push(a % b);
             else if (op.equals("^")) valueStack.push(Math.pow(a, b));
         }
-        
         return valueStack.pop();
     }
 
